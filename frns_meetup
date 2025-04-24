@@ -1,0 +1,230 @@
+use frns_meetup;
+Database changed
+mysql> show tables;
++-------------------------+
+| Tables_in_frns_meetup   |
++-------------------------+
+| beaches                 |
+| genres                  |
+| movies                  |
+| shopping_malls          |
+| student_fav_beaches     |
+| student_fav_malls       |
+| student_fav_movies      |
+| student_favorites       |
+| student_movie_interests |
+| students                |
++-------------------------+
+
+SELECT s.name, m.mall_name
+FROM students s
+JOIN student_fav_malls f ON s.student_id = f.student_id
+JOIN shopping_malls m ON f.mall_id = m.mall_id;
+    
+      +--------+--------------------+
+| name   | mall_name          |
++--------+--------------------+
+| Ajay   | Phoenix Mall       |
+| Ravi   | Phoenix Marketcity |
+| Ajay   | VR Mall            |
+| Karan  | Select Citywalk    |
+| Divya  | Lulu Mall          |
+| Sneha  | Inorbit Mall       |
+| Meena  | Ambience Mall      |
+| Ayesha | Forum Mall         |
+| Vikram | Express Avenue     |
+| Rahul  | Mantri Square      |
++--------+--------------------+
+
+
+mysql> UPDATE student_favorites 
+    -> SET favorite_actress = 'Deepika Padukone'
+    -> WHERE student_id = 2;
+Query OK, 1 row affected (0.02 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> UPDATE shopping_malls 
+    -> SET location = 'Hyderabad'
+    -> WHERE mall_id = 3;
+
+1). Find Students Who Share Similar Movie Genres
+SELECT g.genre_name, GROUP_CONCAT(s.name SEPARATOR ', ') AS students
+FROM student_movie_interests smi
+JOIN genres g ON smi.genre_id = g.genre_id
+JOIN students s ON smi.student_id = s.student_id
+GROUP BY g.genre_name
+HAVING COUNT(smi.student_id) > 1;
++------------+--------------------+
+| genre_name | students           |
++------------+--------------------+
+| Action     | Ajay, Ravi, Farhan |
+| Romance    | Kavi, Ravi         |
++------------+--------------------+
+
+ 2. Group Students by Favorite Actor/Actress (Fan Clubs)
+  SELECT favorite_actor, GROUP_CONCAT(s.name SEPARATOR ', ') AS fan_club
+FROM student_favorites sf
+JOIN students s ON sf.student_id = s.student_id
+GROUP BY favorite_actor
+HAVING COUNT(sf.student_id) > 1;
++----------------+--------------+
+| favorite_actor | fan_club     |
++----------------+--------------+
+| Aamir Khan     | Ravi, Farhan |
++----------------+--------------+
+
+
+3. Find Students with Common Favorite Malls (Friend Meetup Suggestion)
+SELECT m.mall_name, GROUP_CONCAT(s.name SEPARATOR ', ') AS students
+FROM student_fav_malls sfm
+JOIN shopping_malls m ON sfm.mall_id = m.mall_id
+JOIN students s ON sfm.student_id = s.student_id
+GROUP BY sfm.mall_id
+HAVING COUNT(sfm.student_id) > 1;
++--------------+--------------------+
+| mall_name    | students           |
++--------------+--------------------+
+| Phoenix Mall | Ajay, Kavi, Farhan |
++--------------+--------------------+
+ 
+
+4. Popular Culture Insights
+    Most Liked Actor
+SELECT favorite_actor, COUNT(*) AS likes
+FROM student_favorites
+GROUP BY favorite_actor
+ORDER BY likes DESC
+LIMIT 1;
++----------------+-------+
+| favorite_actor | likes |
++----------------+-------+
+| Aamir Khan     |     2 |
++----------------+-------+
+
+
+ Most Popular Genre
+SELECT g.genre_name, COUNT(*) AS popularity
+FROM student_movie_interests smi
+JOIN genres g ON smi.genre_id = g.genre_id
+GROUP BY smi.genre_id
+ORDER BY popularity DESC
+LIMIT 1;
+
++------------+------------+
+| genre_name | popularity |
++------------+------------+
+| Action     |          3 |
++------------+------------+
+ Top 5 Favorite Movies
+SELECT m.movie_name, COUNT(*) AS fan_count
+FROM student_fav_movies sfm
+JOIN movies m ON sfm.movie_id = m.movie_id
+GROUP BY sfm.movie_id
+ORDER BY fan_count DESC
+LIMIT 5;
++------------+-----------+
+| movie_name | fan_count |
++------------+-----------+
+| 3 Idiots   |         2 |
+| Leo        |         1 |
+| Jawan      |         1 |
+| Bahubali   |         1 |
+| PK         |         1 |
++------------+-----------+
+5 rows in set (0.00 sec)
+
+
+
+
+
+
+
+
+
+
+
+
+Creation query.....
+
+
+
+-- Students Table
+CREATE TABLE students (
+    student_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    gender ENUM('Male', 'Female', 'Other'),
+    contact_info VARCHAR(255)
+);
+
+-- Genres (for movie interests)
+CREATE TABLE genres (
+    genre_id INT PRIMARY KEY AUTO_INCREMENT,
+    genre_name VARCHAR(50)
+);
+
+-- Movies Table
+CREATE TABLE movies (
+    movie_id INT PRIMARY KEY AUTO_INCREMENT,
+    movie_name VARCHAR(100),
+    hero_name VARCHAR(100),
+    heroine_name VARCHAR(100)
+);
+
+-- Favorite Actor/Actress
+CREATE TABLE student_favorites (
+    student_id INT PRIMARY KEY,
+    favorite_actor VARCHAR(100),
+    favorite_actress VARCHAR(100),
+    FOREIGN KEY(student_id) REFERENCES students(student_id)
+);
+
+-- Movie Interests (Many-to-Many)
+CREATE TABLE student_movie_interests (
+    student_id INT,
+    genre_id INT,
+    PRIMARY KEY(student_id, genre_id),
+    FOREIGN KEY(student_id) REFERENCES students(student_id),
+    FOREIGN KEY(genre_id) REFERENCES genres(genre_id)
+);
+
+-- Shopping Malls
+CREATE TABLE shopping_malls (
+    mall_id INT PRIMARY KEY AUTO_INCREMENT,
+    mall_name VARCHAR(100),
+    location VARCHAR(100)
+);
+
+-- Favorite Malls (Many-to-Many)
+CREATE TABLE student_fav_malls (
+    student_id INT,
+    mall_id INT,
+    PRIMARY KEY(student_id, mall_id),
+    FOREIGN KEY(student_id) REFERENCES students(student_id),
+    FOREIGN KEY(mall_id) REFERENCES shopping_malls(mall_id)
+);
+
+-- Beaches
+CREATE TABLE beaches (
+    beach_id INT PRIMARY KEY AUTO_INCREMENT,
+    beach_name VARCHAR(100),
+    location VARCHAR(100)
+);
+
+-- Favorite Beaches (Many-to-Many)
+CREATE TABLE student_fav_beaches (
+    student_id INT,
+    beach_id INT,
+    PRIMARY KEY(student_id, beach_id),
+    FOREIGN KEY(student_id) REFERENCES students(student_id),
+    FOREIGN KEY(beach_id) REFERENCES beaches(beach_id)
+);
+
+-- Favorite Movies (Many-to-Many)
+CREATE TABLE student_fav_movies (
+    student_id INT,
+    movie_id INT,
+    PRIMARY KEY(student_id, movie_id),
+    FOREIGN KEY(student_id) REFERENCES students(student_id),
+    FOREIGN KEY(movie_id) REFERENCES movies(movie_id)
+);
+
