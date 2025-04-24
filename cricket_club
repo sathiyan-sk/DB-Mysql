@@ -1,0 +1,46 @@
+mysql> use cricket_club;
+
+Database changed
+mysql> show tables
++------------------------+
+| Tables_in_cricket_club |
++------------------------+
+| players                |
++------------------------+
+1 row in set (0.01 sec)
+
+mysql> select * from players;
++-----------+-------------+------------+
+| player_id | player_name | captain_id |
++-----------+-------------+------------+
+|         5 | Captain C   |       NULL |
+|         6 | Captain A   |       NULL |
+|         7 | Dhoni       |       NULL |
+|       114 | Fiyas       |        444 |
+|       444 | Captain B   |       NULL |
+|       555 | Alex Patel  |       NULL |
+|       888 | Virat       |       NULL |
+|      2002 | KDFC        |          5 |
+|    600028 | Sachin      |          6 |
+
+
+SELECT  p.player_id, p.player_name AS PlayerName,p.captain_id, c.player_name AS CaptainName
+FROM players p
+LEFT JOIN 
+    players c ON p.captain_id = c.player_id;
+
++-----------+------------+------------+-------------+
+| player_id | PlayerName | captain_id | CaptainName |
++-----------+------------+------------+-------------+
+|         5 | Captain C  |       NULL | NULL        |
+|         6 | Captain A  |       NULL | NULL        |
+|         7 | Dhoni      |       NULL | NULL        |
+|       114 | Fiyas      |        444 | Captain B   |
+|       444 | Captain B  |       NULL | NULL        |
+|       555 | Alex Patel |       NULL | NULL        |
+|       888 | Virat      |       NULL | NULL        |
+|      2002 | KDFC       |          5 | Captain C   |
+|    600028 | Sachin     |          6 | Captain A   |
++-----------+------------+------------+-------------+
+9 rows in set (0.00 sec)
+
