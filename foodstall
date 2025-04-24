@@ -1,0 +1,69 @@
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| IT_workers         |
+| School             |
+| cricket_club       |
+| foodstall          |
+| frns_meetup        |
+| hotel              |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sample             |
+| sys                |
++--------------------+
+11 rows in set (0.00 sec)
+
+mysql> use fodstall
+
+CREATE TABLE bills (
+  bill_id INT PRIMARY KEY AUTO_INCREMENT, student_name VARCHAR(100),  cake_stall_amount DECIMAL(10,2),  drink_stall_amount DECIMAL(10,2), food_stall_amount DECIMAL(10,2), bill_date DATE );
+
+INSERT INTO bills (student_name, cake_stall_amount, drink_stall_amount, food_stall_amount, bill_date) 
+ VALUES ('Suhail', 100.00, 50.00, 120.00, '2025-04-20'),
+  ('Fiyas', 80.00, 60.00, 150.00, '2025-04-20'),
+  ('Meena', 0.00, 30.00, 90.00, '2025-04-20'),
+  ('Ajay', 50.00, 0.00, 70.00, '2025-04-21'),
+  ('Kavi', 90.00, 70.00, 130.00, '2025-04-21'),
+  ('Manoj', 0.00, 80.00, 100.00, '2025-04-21'),
+    ('Divya', 120.00, 50.00, 0.00, '2025-04-22'),
+  ('Ravi', 60.00, 40.00, 110.00, '2025-04-22'),
+  ('Sneha', 100.00, 100.00, 100.00, '2025-04-22'),
+    ('Farhan', 110.00, 55.00, 75.00, '2025-04-22');
+
+mysql> select * from bills;
++---------+--------------+-------------------+--------------------+-------------------+------------+
+| bill_id | student_name | cake_stall_amount | drink_stall_amount | food_stall_amount | bill_date  |
++---------+--------------+-------------------+--------------------+-------------------+------------+
+|       1 | Suhail       |            100.00 |              50.00 |            120.00 | 2025-04-20 |
+|       2 | Fiyas        |             80.00 |              60.00 |            150.00 | 2025-04-20 |
+|       3 | Meena        |              0.00 |              30.00 |             90.00 | 2025-04-20 |
+|       4 | Ajay         |             50.00 |               0.00 |             70.00 | 2025-04-21 |
+|       5 | Kavi         |             90.00 |              70.00 |            130.00 | 2025-04-21 |
+|       6 | Manoj        |              0.00 |              80.00 |            100.00 | 2025-04-21 |
+|       7 | Divya        |            120.00 |              50.00 |              0.00 | 2025-04-22 |
+|       8 | Ravi         |             60.00 |              40.00 |            110.00 | 2025-04-22 |
+|       9 | Sneha        |            100.00 |             100.00 |            100.00 | 2025-04-22 |
+|      10 | Farhan       |            110.00 |              55.00 |             75.00 | 2025-04-22 |
++---------+--------------+-------------------+--------------------+-------------------+------------+
+
+     SELECT 'Cake Stall' AS stall_name, SUM(cake_stall_amount) AS total_collected
+      FROM bills
+        UNION 
+       SELECT 'Drink Stall', SUM(drink_stall_amount) FROM bills
+          UNION
+        SELECT 'Food Stall', SUM(food_stall_amount) FROM bills;
+
++-------------+-----------------+
+| stall_name  | total_collected |
++-------------+-----------------+
+| Cake Stall  |          710.00 |
+| Drink Stall |          535.00 |
+| Food Stall  |          945.00 |
++-------------+-----------------+
+
+
+
